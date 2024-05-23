@@ -70,3 +70,100 @@ class Alien(Agent):
         if free_locations and self.__energy > 0:
             random_free_location = random.choice(free_locations)
             self.__move(mars, random_free_location)
+
+    def __move_towards_rover(self, mars: Mars, rover: Rover):
+        current_x = self.get_location().get_x()
+        current_y = self.get_location().get_y()
+        rover_location = rover.get_location()
+        dx = rover_location.get_x() - current_x
+        dy = rover_location.get_y() - current_y
+
+        dir_x = 1 if dx > 0 else -1 if dx < 0 else 0
+        dir_y = 1 if dy > 0 else -1 if dy < 0 else 0
+
+        new_location = Location(current_x + dir_x, current_y + dir_y)
+        if new_location in mars.get_free_adjacent_locations(self.get_location()):
+            self.__move(mars, new_location)
+            self.__energy -= 20
+
+    def __is_adjacent_to_rover(self, mars: Mars) -> bool:
+        # adjacent_locations = mars.get_adjacent_locations(self.get_location())
+        # for adjacent_location in adjacent_locations:
+        #     agent = mars.get_agent(adjacent_location)
+        #     if isinstance(agent, Rover):
+        #         return True
+        # return False
+        current_location = self.get_location()
+        adjacent_locations = mars.get_adjacent_locations(current_location)
+        for adjacent_location in adjacent_locations:
+            agent = mars.get_agent(adjacent_location)
+            if isinstance(agent, Rover):
+                return True
+        # Check if there is a rover at the current location
+        agent = mars.get_agent(current_location)
+        if isinstance(agent, Rover):
+            return True
+        return False
+
+    def __choose_rover_to_chase(self, rovers: List[Rover]) -> Optional[Rover]:
+        if rovers:
+            return rovers[0]  # Choose the first rover found
+        return None
+
+    def __chase_rover(self, mars: Mars, rovers: List[Rover]) -> None:
+        chosen_rover = self.__choose_rover_to_chase(rovers)
+        if chosen_rover:
+            if not chosen_rover.is_destroyed():
+                self.__move_towards_rover(mars, chosen_rover)
+
+        # chosen_rover = self.__choose_rover_to_chase(rovers)
+        # if chosen_rover:
+        #     self.__move_towards_rover(mars, chosen_rover)
+        #     # Check if the alien is near the spacecraft after moving towards the rover
+        #     spacecraft_location = self.__sense_spacecraft_location(mars)
+        #     if spacecraft_location and self.__is_near_spacecraft(mars, spacecraft_location):
+        #         # If near spacecraft, move away and return
+        #         self.__move_away_from_spacecraft(mars, spacecraft_location)
+        #         return
+        #
+        #     # If the alien couldn't get close to the spacecraft, move randomly
+        #     self.__move_randomly(mars)
+
+    def __scan_for_rovers(self, mars: Mars) -> List[Rover]:
+        current_location = self.get_location()
+        found_rovers = []
+
+        # Iterate over a range of offsets for both x and y coordinates
+        for x_offset in range(-3, 4):
+            for y_offset in range(-3, 4):
+                # Calculate the coordinates of the adjacent location
+                x = (current_location.get_x() + x_offset) % Config.world_size
+                y = (current_location.get_y() + y_offset) % Config.world_size
+                adjacent_location = Location(x, y)
+
+                # Check if there's a rover at the adjacent location
+                agent = mars.get_agent(adjacent_location)
+                if isinstance(agent, Rover):
+                    found_rovers.append(agent)
+                    print(f"Alien found rover found at location: {adjacent_location}")
+
+            return found_rovers
+
+        # adjacent_locations = mars.get_adjacent_locations(self.get_location())
+        # found_rovers = []
+        # for adjacent_location in adjacent_locations:
+        #     agent = mars.get_agent(adjacent_location)
+        #     if isinstance(agent, Rover):
+        #         found_rovers.append(agent)
+        # return found_rovers
+
+    def __attack_rover(self, mars: Mars, rover: Rover):
+        self.__energy -= 20
+        print(f"Alien's current energy level: {self.__energy}")
+        rover.sustain_damage(mars, 25)
+        print(f"%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%Alien Attacked Rover {rover.get_id()}")
+
+    def __restore_energy(self):
+        self.__energy = min(self.__energy + 10, 100)
+        if self.__energy == 100:
+            self.__hibernating = False
