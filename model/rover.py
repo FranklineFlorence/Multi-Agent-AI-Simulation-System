@@ -31,3 +31,17 @@ class Rover(Agent):
         self.__remembered_rock_locations: List[Location] = []
         self.__destroyed = False
         self.__shield_level = 100
+
+    def __repr__(self) -> str:
+        return f"Rover({repr(self.get_location())})"
+
+    def __str__(self) -> str:
+        return f"Rover is located at: ({repr(self.get_location())})"
+
+    def __hash__(self) -> int:
+        return hash(self.__id)
+
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, Rover):
+            return NotImplemented
+        return self.__id == other.__id
