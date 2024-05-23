@@ -45,3 +45,9 @@ class Rover(Agent):
         if not isinstance(other, Rover):
             return NotImplemented
         return self.__id == other.__id
+
+    """
+    ===== Display ID =====
+    """
+    def get_id(self) -> int:
+        return self.__id
