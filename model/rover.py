@@ -47,6 +47,65 @@ class Rover(Agent):
         return self.__id == other.__id
 
     """
+    ===== ACT METHOD =====
+    """
+    def act(self, mars: Mars):
+        print(f"Rover {self.__id}- Battery level: {self.__battery_level}, Current location: {self.get_location()}")
+        if self.__destroyed:
+            print("is destroyed")
+            return
+        if self.__battery_level > 0:
+            if self.__rock:
+                print(f"=============| Rover {self.__id} has rock |===================")
+                if self.__scan_for_spacecraft_in_adjacent_cells(mars):
+                    # print(f"Rover {self.__id} waiting to drop rock")
+                    return
+                else:
+                    # print(f"Rover {self.__id} moving towards spacecraft.")
+                    self.__move_towards_spacecraft(mars)
+            elif self.__target_location:
+                print(f"Rover {self.__id} has target")
+                if self.__is_adjacent_to_target(mars, self.__target_location):
+                    # print("🚀 is adjacent to target")
+                    rock_at_target = mars.get_agent(self.__target_location)
+                    if isinstance(rock_at_target, Rock):
+                        self.__pick_up_rock(mars, rock_at_target)
+                        print(f"+++++++++++++++target_picked at {self.__target_location}++++++++++++++")
+                    else:
+                        self.__target_location = None
+                else:
+                    self.__move_towards_rock(mars, self.__target_location)
+                    print(f"Rover {self.__id} moving towards rock at target location: {self.__target_location}")
+            else:
+                adjacent_rocks = self.__scan_for_rocks(mars)
+                if len(adjacent_rocks) > 0:
+                    # print(f"Rover {self.__id} picking up adjacent rock.")
+                    self.__pick_up_rock(mars, adjacent_rocks[0])
+                    if len(adjacent_rocks) > 1:
+                        remaining_rocks = adjacent_rocks[1:]
+                        for rock in remaining_rocks:
+                            self.__remember_rock_location(rock.get_location())
+                            # print(f"-----------------------------------------------------")
+                            # print(f"|Rover {self.__id} remembering rock location =>{rock.get_location()}|")
+                else:
+                    # print(f"Rover {self.__id} moving to random location.")
+                    self.__move_to_random_location(mars)
+        else:
+            # Check if adjacent to another rover
+            print(f"Rover {self.__id}- No charge!")
+            if self.__scan_for_spacecraft_in_adjacent_cells(mars):
+                self.recharge(100)
+            else:
+                nearby_rovers = self.__scan_for_rovers(mars)
+                for nearby_rover in nearby_rovers:
+                    if nearby_rover.get_battery_level() > 50:
+                        print(f"Rover {self.__id} requesting battery from nearby rover {nearby_rover.get_id()}")
+                        nearby_rover.share_battery(self)
+                        # if self.__rock is None:
+                        self.pick_rock_from_rover(nearby_rover)
+                # print(f"Rover {self.__id} battery level: {self.__battery_level}")
+
+    """
     ===== Display ID =====
     """
     def get_id(self) -> int:
@@ -291,7 +350,7 @@ class Rover(Agent):
 
         mars.set_agent(None, current_location)  # Remove the rover from the current location
         self.set_location(None)  # Set the rover's location to None
-        self.destroyed = True
+        self.__destroyed = True
         print(f"Rover {self.__id} has been destroyed and removed from the location.")
         return True
 
@@ -344,62 +403,3 @@ class Rover(Agent):
     #     print(f"Both ##Rover {self.get_id()} and Rover {other_rover.get_id()} have rocks")
     # else:
     #     print(f"Neither ##Rover {self.get_id()} nor Rover {other_rover.get_id()} have rocks")
-
-    """
-    ===== ACT METHOD =====
-    """
-    def act(self, mars: Mars):
-        print(f"Rover {self.__id}- Battery level: {self.__battery_level}, Current location: {self.get_location()}")
-        if self.__destroyed:
-            print("is destroyed")
-            return
-        if self.__battery_level > 0:
-            if self.__rock:
-                print(f"=============| Rover {self.__id} has rock |===================")
-                if self.__scan_for_spacecraft_in_adjacent_cells(mars):
-                    # print(f"Rover {self.__id} waiting to drop rock")
-                    return
-                else:
-                    # print(f"Rover {self.__id} moving towards spacecraft.")
-                    self.__move_towards_spacecraft(mars)
-            elif self.__target_location:
-                print(f"Rover {self.__id} has target")
-                if self.__is_adjacent_to_target(mars, self.__target_location):
-                    # print("🚀 is adjacent to target")
-                    rock_at_target = mars.get_agent(self.__target_location)
-                    if isinstance(rock_at_target, Rock):
-                        self.__pick_up_rock(mars, rock_at_target)
-                        print(f"+++++++++++++++target_picked at {self.__target_location}++++++++++++++")
-                    else:
-                        self.__target_location = None
-                else:
-                    self.__move_towards_rock(mars, self.__target_location)
-                    print(f"Rover {self.__id} moving towards rock at target location: {self.__target_location}")
-            else:
-                adjacent_rocks = self.__scan_for_rocks(mars)
-                if len(adjacent_rocks) > 0:
-                    # print(f"Rover {self.__id} picking up adjacent rock.")
-                    self.__pick_up_rock(mars, adjacent_rocks[0])
-                    if len(adjacent_rocks) > 1:
-                        remaining_rocks = adjacent_rocks[1:]
-                        for rock in remaining_rocks:
-                            self.__remember_rock_location(rock.get_location())
-                            # print(f"-----------------------------------------------------")
-                            # print(f"|Rover {self.__id} remembering rock location =>{rock.get_location()}|")
-                else:
-                    # print(f"Rover {self.__id} moving to random location.")
-                    self.__move_to_random_location(mars)
-        else:
-            # Check if adjacent to another rover
-            print(f"Rover {self.__id}- No charge!")
-            if self.__scan_for_spacecraft_in_adjacent_cells(mars):
-                self.recharge(100)
-            else:
-                nearby_rovers = self.__scan_for_rovers(mars)
-                for nearby_rover in nearby_rovers:
-                    if nearby_rover.get_battery_level() > 50:
-                        print(f"Rover {self.__id} requesting battery from nearby rover {nearby_rover.get_id()}")
-                        nearby_rover.share_battery(self)
-                        # if self.__rock is None:
-                        self.pick_rock_from_rover(nearby_rover)
-                # print(f"Rover {self.__id} battery level: {self.__battery_level}")
