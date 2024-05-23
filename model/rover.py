@@ -140,7 +140,6 @@ class Rover(Agent):
     """
     ===== Functions for Scanning =====
     """
-
     def __scan_for_spacecraft_in_adjacent_cells(self, mars: Mars) -> bool:
         adjacent_locations = mars.get_adjacent_locations(self.get_location())
         for loc in adjacent_locations:
@@ -198,7 +197,6 @@ class Rover(Agent):
     """
     ===== Functions for Battery Management =====
     """
-
     def get_battery_level(self) -> float:
         return self.__battery_level
 
@@ -214,3 +212,58 @@ class Rover(Agent):
         else:
             print(f"Rover {self.__id} has insufficient battery (Battery level: {self.__battery_level}) "
                   f"to share with Rover {other_rover.get_id()} ")
+
+    """
+    ===== Functions for damage control Management =====
+    """
+    def sustain_damage(self, mars, damage):
+        self.__shield_level -= damage
+        if self.__shield_level <= 0:
+            self.__shield_level = 0
+            self.__destroyed = True
+            if self.__rock:
+                rock = self.__rock
+                mars.set_agent(None, self.get_location())
+                self.set_location(self.__space_craft_location)
+                mars.set_agent(rock, rock.get_location())
+
+    def get_damage_level(self):
+        return 100 - self.__battery_level
+
+    def destroy(self, mars: Mars):
+        """
+        Handles the destruction of the rover.
+
+        When a rover is destroyed, it drops any rock it is carrying at its current location.
+        """
+        # if self.__rock:
+        #     rock = self.__rock
+        #     self.drop_rock()
+        #     print("dropped rock")
+        # self.destroyed = True
+
+        if self.__destroyed:
+            return False
+
+        if self.__rock:
+            rock_location = self.get_location()
+            self.__rock.set_location(rock_location)
+            print(f"Rover {self.__id} destroyed, hence dropped the rock at location: {rock_location}")
+
+            mars.set_agent(self.__rock, rock_location)  # Add the rock back to the Mars grid
+            self.drop_rock()
+
+        current_location = self.get_location()
+        print(f"Rover {self.__id} current location before destruction: {current_location}")
+
+        mars.set_agent(None, current_location)  # Remove the rover from the current location
+        self.set_location(None)  # Set the rover's location to None
+        self.destroyed = True
+        print(f"Rover {self.__id} has been destroyed and removed from the location.")
+        return True
+
+    def is_destroyed(self):
+        print("##################################################################################################")
+        print(self.__shield_level)
+        return self.__destroyed
+
