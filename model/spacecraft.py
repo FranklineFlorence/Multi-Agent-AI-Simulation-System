@@ -30,3 +30,12 @@ class Spacecraft(Agent):
             if isinstance(agent, Rover):
                 found_rovers.append(agent)
         return found_rovers
+
+    def __collect_rock_from_rover(self, rover: Rover) -> None:
+        rock = rover.get_rock()
+        if rock:
+            self.__collected_rocks.append(rock)  # Store the rock in the spacecraft
+            rover.drop_rock()  # Drop the rock from the rover
+            self.receive_rock_locations(rover.get_remembered_rock_locations())
+        # self.remove_remembered_rock_location(rover.get_location())
+
