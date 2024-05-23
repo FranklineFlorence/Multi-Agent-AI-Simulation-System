@@ -136,3 +136,61 @@ class Rover(Agent):
         if self.__rock:
             other_rover.__rock = self.__rock
             self.__rock = None
+
+    """
+    ===== Functions for Scanning =====
+    """
+
+    def __scan_for_spacecraft_in_adjacent_cells(self, mars: Mars) -> bool:
+        adjacent_locations = mars.get_adjacent_locations(self.get_location())
+        for loc in adjacent_locations:
+            if loc == self.__space_craft_location:
+                recharge_amount = 100.0 - self.__battery_level
+                self.recharge(recharge_amount)  # Recharge to full battery
+                return True
+        return False
+
+    def __scan_for_rocks(self, mars: Mars) -> List[Rock]:
+        adjacent_locations = mars.get_adjacent_locations(self.get_location())
+        found_rocks = []
+        for adjacent_location in adjacent_locations:
+            agent = mars.get_agent(adjacent_location)
+            if isinstance(agent, Rock):
+                found_rocks.append(agent)
+        return found_rocks
+
+    def __is_adjacent_to_rock(self, mars: Mars, location: Location) -> bool:
+        adjacent_locations = mars.get_adjacent_locations(location)
+        for adjacent_location in adjacent_locations:
+            agent = mars.get_agent(adjacent_location)
+            if isinstance(agent, Rock):
+                return True
+        return False
+
+    def __is_adjacent_to_target(self, mars: Mars, target_location: Location) -> bool:
+        adjacent_locations = mars.get_adjacent_locations(self.get_location())
+        for adjacent_location in adjacent_locations:
+            if adjacent_location == target_location:
+                return True
+        return False
+
+    def __scan_for_rovers(self, mars: Mars) -> List[Rover]:
+        adjacent_locations = mars.get_adjacent_locations(self.get_location())
+        found_rovers = []
+        for adjacent_location in adjacent_locations:
+            agent = mars.get_agent(adjacent_location)
+            if isinstance(agent, Rover):
+                found_rovers.append(agent)
+        return found_rovers
+
+    def __is_adjacent_to_other_rover(self, mars: Mars) -> bool:
+        adjacent_locations = mars.get_adjacent_locations(self.get_location())
+        for adjacent_location in adjacent_locations:
+            agent = mars.get_agent(adjacent_location)
+            if isinstance(agent, Rover):
+                return True
+        return False
+
+    def __is_adjacent_to(self, mars: Mars, location: Location) -> bool:
+        adjacent_locations = mars.get_adjacent_locations(self.get_location())
+        return location in adjacent_locations
