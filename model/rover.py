@@ -111,4 +111,35 @@ class Rover(Agent):
         else:
             self.__move_to_random_location(mars)
 
+    """
+    ===== Functions for Rock Handling =====
+    """
+    def __pick_up_rock(self, mars: Mars, rock: Rock):
 
+        if rock is not None:
+            print(f"Rover {self.__id} is picking up the rock at location: {rock.get_location()}")
+            self.__rock = rock
+            self.__move(mars, rock.get_location())
+
+            # Remove the picked-up rock location from remembered rock locations
+            if rock.get_location() in self.__remembered_rock_locations:
+                self.__remembered_rock_locations.remove(rock.get_location())
+
+            self.__target_location = None
+        else:
+            print("Error: Cannot pick up rock. The rock object is None.")
+
+    def has_rock(self) -> bool:
+        return self.__rock is not None
+
+    def drop_rock(self) -> None:
+        if self.__rock:
+            self.__rock = None
+
+    def get_rock(self):
+        """Return the rock the rover is carrying, if any."""
+        return self.__rock
+
+    def set_rock(self, rock):
+        """Set the rock the rover is carrying."""
+        self.__rock = rock
