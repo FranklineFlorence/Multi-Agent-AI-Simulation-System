@@ -21,3 +21,12 @@ class Spacecraft(Agent):
     def __str__(self) -> str:
         return (f"Spacecraft is located at: ({repr(self.get_location())})"
                 f" rocks collected")
+
+    def __scan_for_rovers_in_adjacent_cells(self, mars: Mars) -> List[Rover]:
+        adjacent_locations = mars.get_adjacent_locations(self.get_location())
+        found_rovers = []
+        for adjacent_location in adjacent_locations:
+            agent = mars.get_agent(adjacent_location)
+            if isinstance(agent, Rover):
+                found_rovers.append(agent)
+        return found_rovers
