@@ -111,5 +111,28 @@ class Rover(Agent):
         else:
             self.__move_to_random_location(mars)
 
+    """
+    ===== Functions for Rock Management =====
+    """
+    def __remember_rock_location(self, location: Location) -> None:
+        if location not in self.__remembered_rock_locations:
+            self.__remembered_rock_locations.append(location)
 
+    def get_remembered_rock_locations(self) -> List[Location]:
+        return self.__remembered_rock_locations
 
+    def __select_target_rock(self) -> Optional[Location]:
+        if self.__remembered_rock_locations:
+            return self.__remembered_rock_locations.pop(0)
+        return None
+
+    def set_target_location(self, location: Location) -> None:
+        self.__target_location = location
+
+    def get_target_location(self) -> Location:
+        return self.__target_location
+
+    def __pass_rock_to_rover(self, other_rover: Rover) -> None:
+        if self.__rock:
+            other_rover.__rock = self.__rock
+            self.__rock = None
