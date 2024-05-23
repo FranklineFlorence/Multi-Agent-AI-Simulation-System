@@ -194,3 +194,23 @@ class Rover(Agent):
     def __is_adjacent_to(self, mars: Mars, location: Location) -> bool:
         adjacent_locations = mars.get_adjacent_locations(self.get_location())
         return location in adjacent_locations
+
+    """
+    ===== Functions for Battery Management =====
+    """
+
+    def get_battery_level(self) -> float:
+        return self.__battery_level
+
+    def recharge(self, amount: float):
+        self.__battery_level = min(self.__battery_level + amount, 100.0)
+
+    def share_battery(self, other_rover: Rover):
+        if self.__battery_level > 50:
+            share_amount = self.__battery_level - 50
+            self.__battery_level -= share_amount
+            other_rover.recharge(share_amount)
+            print(f"Rover {self.__id} shared {share_amount} battery with Rover {other_rover.get_id()}")
+        else:
+            print(f"Rover {self.__id} has insufficient battery (Battery level: {self.__battery_level}) "
+                  f"to share with Rover {other_rover.get_id()} ")
