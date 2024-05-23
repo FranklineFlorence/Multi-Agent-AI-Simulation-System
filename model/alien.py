@@ -18,6 +18,36 @@ class Alien(Agent):
         self.__energy = 100
         self.__hibernating = False
 
+    def act(self, mars: Mars) -> None:
+        if self.__hibernating:
+            self.__restore_energy()
+            print("restoring")
+            return
+
+        if self.__energy <= 20:
+            self.__hibernating = True
+            print("hibernating")
+            return
+
+        spacecraft_location = self.__sense_spacecraft_location(mars)
+
+        if spacecraft_location and self.__is_near_spacecraft(mars, spacecraft_location):
+            self.__move_away_from_spacecraft(mars, spacecraft_location)
+            print(f"Alien {self.get_location()} moved away from the spacecraft")
+        else:
+            print(f"Alien {self.get_location()} moved to a random location.")
+            rovers = self.__scan_for_rovers(mars)
+            for rover in rovers:
+
+                self.__chase_rover(mars, rovers)
+                print(f"Alien {self.get_location()} chasing rover {rover.get_id()}")
+                if self.__is_adjacent_to_rover(mars):
+                    print("~~Alien adjacent")
+                    self.__attack_rover(mars, rover)
+                    print("~~Alien attacking")
+
+            self.__move_randomly(mars)
+
     def __sense_spacecraft_location(self, mars: Mars) -> Location:
         # Sensing spacecraft within a 3-cell radius
         current_location = self.get_location()
