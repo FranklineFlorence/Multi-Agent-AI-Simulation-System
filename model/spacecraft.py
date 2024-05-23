@@ -22,6 +22,23 @@ class Spacecraft(Agent):
         return (f"Spacecraft is located at: ({repr(self.get_location())})"
                 f" rocks collected")
 
+    def act(self, mars: Mars) -> None:
+        found_rovers = self.__scan_for_rovers_in_adjacent_cells(mars)
+        if found_rovers:
+            for rover in found_rovers:
+                if rover.has_rock():
+                    self.__collect_rock_from_rover(rover)
+                    rover.get_remembered_rock_locations()
+                    rover.recharge(100.0)
+                    self.__assign_target_location_to_rover(rover)
+                    print(f"------------------------------------------------"
+                          f"Spacecraft collected a rock from rover {rover.get_id()}. "
+                          f"Total rocks collected: {len(self.__collected_rocks)}"
+                          f"------------------------------------------------")
+
+                # if rover.get_battery_level() == 0:
+                #     self.send_help(rover, mars)
+
     def __scan_for_rovers_in_adjacent_cells(self, mars: Mars) -> List[Rover]:
         adjacent_locations = mars.get_adjacent_locations(self.get_location())
         found_rovers = []
@@ -94,4 +111,3 @@ class Spacecraft(Agent):
                 self.__total_rocks_collected -= 100
                 print(f"New rover created at location {new_location}")
     """
-
