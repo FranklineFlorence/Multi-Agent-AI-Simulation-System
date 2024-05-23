@@ -51,3 +51,64 @@ class Rover(Agent):
     """
     def get_id(self) -> int:
         return self.__id
+
+    """
+    ===== Functions for Movement =====
+    """
+
+    def __move(self, mars, new_location: Location) -> None:
+        previous_location = self.get_location()
+        mars.set_agent(self, new_location)
+        self.set_location(new_location)
+        mars.set_agent(None, previous_location)
+        if self.__rock:
+            self.__rock.set_location(new_location)
+        self.__battery_level -= 5.0  # Decrease battery level with each move
+
+    def __move_to_random_location(self, mars: Mars) -> None:
+        free_locations = mars.get_free_adjacent_locations(self.get_location())
+        if free_locations and self.__battery_level >= 5.0:
+            random_free_location = random.choice(free_locations)
+            self.__move(mars, random_free_location)
+        else:
+            # If there are no free adjacent locations, move to any available free location on the map
+            all_free_locations = mars.get_free_locations()
+            if all_free_locations and self.__battery_level >= 5.0:
+                random_free_location = random.choice(all_free_locations)
+                self.__move(mars, random_free_location)
+            else:
+                print(f"Rover {self.__id} cannot move due to low battery or no free locations.")
+
+    def __move_towards_spacecraft(self, mars: Mars) -> bool:
+        current_x = self.get_location().get_x()
+        current_y = self.get_location().get_y()
+        dx = current_x - self.__space_craft_location.get_x()
+        dy = current_y - self.__space_craft_location.get_y()
+        dir_x = -1 if dx > 0 else 1 if dx < 0 else 0
+        dir_y = -1 if dy > 0 else 1 if dy < 0 else 0
+        new_location = Location(current_x + dir_x, current_y + dir_y)
+
+        free_adjacent_locations = mars.get_free_adjacent_locations(self.get_location())
+        if new_location in free_adjacent_locations:
+            self.__move(mars, new_location)
+            return self.__is_adjacent_to(mars, self.__space_craft_location)
+        else:
+            self.__move_to_random_location(mars)
+        return False
+
+    def __move_towards_rock(self, mars: Mars, target_location: Location) -> None:
+        current_x = self.get_location().get_x()
+        current_y = self.get_location().get_y()
+        dx = target_location.get_x() - current_x
+        dy = target_location.get_y() - current_y
+        dir_x = 1 if dx > 0 else -1 if dx < 0 else 0
+        dir_y = 1 if dy > 0 else -1 if dy < 0 else 0
+        new_location = Location(current_x + dir_x, current_y + dir_y)
+
+        free_adjacent_locations = mars.get_free_adjacent_locations(self.get_location())
+        if new_location in free_adjacent_locations:
+            self.__move(mars, new_location)
+        else:
+            self.__move_to_random_location(mars)
+
+
