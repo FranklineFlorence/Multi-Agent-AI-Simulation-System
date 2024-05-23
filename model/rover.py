@@ -267,3 +267,47 @@ class Rover(Agent):
         print(self.__shield_level)
         return self.__destroyed
 
+    """
+    ===== COLLABORATION =====
+    """
+    def pick_rock_from_rover(self, other_rover: Rover) -> None:
+        """
+        Pick up a rock from another rover.
+
+        Parameters:
+            other_rover (Rover): The other rover from which to pick up the rock.
+        """
+        print(f"Attempting to pick rock from Rover {other_rover.get_id()} by ##Rover {self.get_id()}")
+
+        rock = other_rover.get_rock()
+        if rock and not self.get_rock():
+            # Transfer the rock from the other rover to this rover
+            self.set_rock(rock)
+            other_rover.drop_rock()
+            print(f"## Rover {self.get_id()} picked up a rock from Rover {other_rover.get_id()}")
+        elif not other_rover.get_rock() and self.get_rock():
+            print(f"## Rover {self.get_id()} has a rock but Rover {other_rover.get_id()} does not have a rock")
+        elif other_rover.get_rock() and self.get_rock():
+            print(f"Both ## Rover {self.get_id()} and Rover {other_rover.get_id()} have rocks")
+        else:
+            print(f"Neither ## Rover {self.get_id()} nor Rover {other_rover.get_id()} have rocks")
+
+    # # Check if the other rover has a rock and the current rover does not
+    #
+    # if other_rover.__rock and not self.__rock:
+    #     # Transfer the rock from the other rover to this rover
+    #     print(
+    #         f"Before transfer: Rover {self.get_id()}"
+    #         f" - Has rock: {self.__rock}, Rover {other_rover.get_id()} - Has rock: {other_rover.__rock}")
+    #     self.__rock = other_rover.__rock
+    #     other_rover.__rock = None
+    #     print(
+    #         f"After transfer: Rover {self.get_id()} - Has rock: {self.__rock}, Rover {other_rover.get_id()} "
+    #         f"- Has rock: {other_rover.__rock}")
+    #     print(f"##Rover {self.get_id()} picked up a rock from Rover {other_rover.get_id()}")
+    # elif not other_rover.__rock and self.__rock:
+    #     print(f"##Rover {self.get_id()} has a rock but Rover {other_rover.get_id()} does not have a rock")
+    # elif other_rover.__rock and self.__rock:
+    #     print(f"Both ##Rover {self.get_id()} and Rover {other_rover.get_id()} have rocks")
+    # else:
+    #     print(f"Neither ##Rover {self.get_id()} nor Rover {other_rover.get_id()} have rocks")
