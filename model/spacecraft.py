@@ -1,4 +1,5 @@
 from __future__ import annotations
+import random
 from typing import List, TYPE_CHECKING
 from model.agent import Agent
 from model.rover import Rover
@@ -13,7 +14,6 @@ class Spacecraft(Agent):
 
     def __init__(self, location: Location):
         super().__init__(location)
-        # self.__total_rocks_collected = 0
         self.__collected_rocks: List[Rock] = []
         self.__remembered_rock_locations: List[Location] = []
         self.__assigned_rovers: dict[Rover, Location] = {}
@@ -31,13 +31,13 @@ class Spacecraft(Agent):
                     rover.get_remembered_rock_locations()
                     rover.recharge(100.0)
                     self.__assign_target_location_to_rover(rover)
-                    # print(f"------------------------------------------------"
-                    #       f"Spacecraft collected a rock from rover {rover.get_id()}. "
-                    #       f"Total rocks collected: {len(self.__collected_rocks)}"
-                    #       f"------------------------------------------------")
+                    print(f"------------------------------------------------"
+                          f"Spacecraft collected a rock from rover {rover.get_id()}. "
+                          f"Total rocks collected: {len(self.__collected_rocks)}"
+                          f"------------------------------------------------")
 
-                # if rover.get_battery_level() == 0:
-                #     self.send_help(rover, mars)
+        if len(self.__collected_rocks) >= 100:
+            self.create_new_rover(mars)
 
     def __scan_for_rovers_in_adjacent_cells(self, mars: Mars) -> List[Rover]:
         adjacent_locations = mars.get_adjacent_locations(self.get_location())
@@ -72,18 +72,6 @@ class Spacecraft(Agent):
         self.__remembered_rock_locations = [location for location in self.__remembered_rock_locations if
                                             location not in self.__assigned_rovers.values()]
 
-    def send_help(self, rover_in_need: Rover, mars: Mars) -> None:
-        found_rovers = self.__scan_for_rovers_in_adjacent_cells(mars)
-        for rover in found_rovers:
-            if rover != rover_in_need and rover.get_battery_level() > 50:
-                rover.share_battery(rover_in_need)
-                # print(f"Spacecraft coordinated help: {rover} shared battery with {rover_in_need}")
-                return
-        # print(f"Spacecraft could not find a rover to help {rover_in_need}")
-
-    def get_remembered_rock_locations(self) -> List[Location]:
-        return self.__remembered_rock_locations
-
     def __assign_target_location_to_rover(self, rover: Rover) -> None:
         if rover in self.__assigned_rovers:
             target_location = self.__assigned_rovers[rover]
@@ -98,16 +86,13 @@ class Spacecraft(Agent):
                 self.__remembered_rock_locations.remove(location)
                 # print(f"Rover {rover.get_id()} assigned to target location: {location}")
                 break
-        # else:
-        #     print(f"No available target locations for rover {rover.get_id()}")
-    """
+
     def create_new_rover(self, mars: Mars) -> None:
-        if self.__total_rocks_collected >= 100:
-            free_locations = mars.get_free_adjacent_locations(self.get_location())
-            if free_locations:
-                new_location = random.choice(free_locations)
-                new_rover = Rover(new_location, self.get_location())
-                mars.add_agent(new_rover)
-                self.__total_rocks_collected -= 100
-                print(f"New rover created at location {new_location}")
-    """
+        free_locations = mars.get_free_adjacent_locations(self.get_location())
+        if free_locations:
+            new_location = random.choice(free_locations)
+            new_rover = Rover(new_location, self.get_location())
+            mars.set_agent(new_rover, new_location)
+            self.__collected_rocks = self.__collected_rocks[100:]  # Remove the first 100 collected rocks
+            print(f"New rover created at location {new_location}")
+

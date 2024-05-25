@@ -6,6 +6,6 @@ class Config:
     world_size = 20
 
     alien_creation_probability = 0.01
-    rock_creation_probability = 0.3
+    rock_creation_probability = 0.5
 
     initial_num_rovers = 8

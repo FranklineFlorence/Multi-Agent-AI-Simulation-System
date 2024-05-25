@@ -15,7 +15,7 @@ class Rock(Agent):
         super().__init__(location)
 
     def __str__(self):
-        pass
+        return f"Rock at {self.get_location()}"
 
     def act(self, environment: Environment) -> None:
         pass

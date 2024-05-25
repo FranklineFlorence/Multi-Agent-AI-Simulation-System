@@ -6,6 +6,7 @@ from model.agent import Agent
 from model.location import Location
 
 if TYPE_CHECKING:
+    from model.alien import Alien
     from model.mars import Mars
     from model.spacecraft import Spacecraft
 
@@ -258,49 +259,7 @@ class Rover(Agent):
         if self.__shield_level <= 0:
             self.__shield_level = 0
 
-            # if self.__rock:
-                # rock = self.__rock
-                # self.set_location(self.__space_craft_location)
-                # mars.set_agent(rock, rock.get_location())
-
-    # def get_damage_level(self):
-    #     return 100 - self.__battery_level
-
-    # def destroy(self, mars: Mars):
-    #     """
-    #     Handles the destruction of the rover.
-    #
-    #     When a rover is destroyed, it drops any rock it is carrying at its current location.
-    #     """
-    #     # if self.__rock:
-    #     #     rock = self.__rock
-    #     #     self.drop_rock()
-    #     #     print("dropped rock")
-    #     # self.destroyed = True
-    #
-    #     if self.__shield_level == 0:
-    #         return False
-    #
-    #     if self.__rock:
-    #         rock_location = self.get_location()
-    #         self.__rock.set_location(rock_location)
-    #         # print(f"Rover {self.__id} destroyed, hence dropped the rock at location: {rock_location}")
-    #
-    #         mars.set_agent(self.__rock, rock_location)  # Add the rock back to the Mars grid
-    #         self.drop_rock()
-    #
-    #     current_location = self.get_location()
-    #     # print(f"Rover {self.__id} current location before destruction: {current_location}")
-    #
-    #     mars.set_agent(None, current_location)  # Remove the rover from the current location
-    #     self.set_location(None)  # Set the rover's location to None
-    #     self.destroyed = True
-    #     # print(f"Rover {self.__id} has been destroyed and removed from the location.")
-    #     return True
-
     def is_destroyed(self):
-        # print("##################################################################################################")
-        # print(self.__shield_level)
         return self.__shield_level == 0
 
     """
@@ -321,33 +280,6 @@ class Rover(Agent):
             # Transfer the rock from the other rover to this rover
             self.set_rock(rock)
             other_rover.drop_rock()
-            # print(f"## Rover {self.get_id()} picked up a rock from Rover {other_rover.get_id()}")
-        # elif not other_rover.get_rock() and self.get_rock():
-            # print(f"## Rover {self.get_id()} has a rock but Rover {other_rover.get_id()} does not have a rock")
-        # elif other_rover.get_rock() and self.get_rock():
-            # print(f"Both ## Rover {self.get_id()} and Rover {other_rover.get_id()} have rocks")
-        # else:
-            # print(f"Neither ## Rover {self.get_id()} nor Rover {other_rover.get_id()} have rocks")
-
-    # # Check if the other rover has a rock and the current rover does not
-        #
-        # if other_rover.__rock and not self.__rock:
-        #     # Transfer the rock from the other rover to this rover
-        #     print(
-        #         f"Before transfer: Rover {self.get_id()}"
-        #         f" - Has rock: {self.__rock}, Rover {other_rover.get_id()} - Has rock: {other_rover.__rock}")
-        #     self.__rock = other_rover.__rock
-        #     other_rover.__rock = None
-        #     print(
-        #         f"After transfer: Rover {self.get_id()} - Has rock: {self.__rock}, Rover {other_rover.get_id()} "
-        #         f"- Has rock: {other_rover.__rock}")
-        #     print(f"##Rover {self.get_id()} picked up a rock from Rover {other_rover.get_id()}")
-        # elif not other_rover.__rock and self.__rock:
-        #     print(f"##Rover {self.get_id()} has a rock but Rover {other_rover.get_id()} does not have a rock")
-        # elif other_rover.__rock and self.__rock:
-        #     print(f"Both ##Rover {self.get_id()} and Rover {other_rover.get_id()} have rocks")
-        # else:
-        #     print(f"Neither ##Rover {self.get_id()} nor Rover {other_rover.get_id()} have rocks")
 
     """
     ===== ACT METHOD =====
