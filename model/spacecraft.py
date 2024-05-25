@@ -54,11 +54,6 @@ class Spacecraft(Agent):
             self.__collected_rocks.append(rock)  # Store the rock in the spacecraft
             rover.drop_rock()  # Drop the rock from the rover
             self.receive_rock_locations(rover.get_remembered_rock_locations())
-        # self.remove_remembered_rock_location(rover.get_location())
-
-    def remove_remembered_rock_location(self, location: Location) -> None:
-        if location in self.__remembered_rock_locations:
-            self.__remembered_rock_locations.remove(location)
 
     def receive_rock_locations(self, rock_locations: List[Location]) -> None:
         for location in rock_locations:
@@ -95,4 +90,3 @@ class Spacecraft(Agent):
             mars.set_agent(new_rover, new_location)
             self.__collected_rocks = self.__collected_rocks[100:]  # Remove the first 100 collected rocks
             print(f"New rover created at location {new_location}")
-

@@ -4,11 +4,8 @@ from typing import TYPE_CHECKING, List, Optional
 from model.rock import Rock
 from model.agent import Agent
 from model.location import Location
-
 if TYPE_CHECKING:
-    from model.alien import Alien
     from model.mars import Mars
-    from model.spacecraft import Spacecraft
 
 
 class Rover(Agent):
@@ -195,7 +192,8 @@ class Rover(Agent):
                 found_rocks.append(agent)
         return found_rocks
 
-    def __is_adjacent_to_rock(self, mars: Mars, location: Location) -> bool:
+    @staticmethod
+    def __is_adjacent_to_rock(mars: Mars, location: Location) -> bool:
         adjacent_locations = mars.get_adjacent_locations(location)
         for adjacent_location in adjacent_locations:
             agent = mars.get_agent(adjacent_location)
@@ -254,10 +252,47 @@ class Rover(Agent):
             # print(f"Rover {self.__id} has insufficient battery (Battery level: {self.__battery_level}) "
             #       f"to share with Rover {other_rover.get_id()} ")
 
-    def sustain_damage(self, mars, damage):
+    def sustain_damage(self, damage):
         self.__shield_level -= damage
         if self.__shield_level <= 0:
             self.__shield_level = 0
+
+            # if self.__rock:
+            # rock = self.__rock
+            # self.set_location(self.__space_craft_location)
+            # mars.set_agent(rock, rock.get_location())
+
+    # def destroy(self, mars: Mars):
+    #     """
+    #     Handles the destruction of the rover.
+    #
+    #     When a rover is destroyed, it drops any rock it is carrying at its current location.
+    #     """
+    #     # if self.__rock:
+    #     #     rock = self.__rock
+    #     #     self.drop_rock()
+    #     #     print("dropped rock")
+    #     # self.destroyed = True
+    #
+    #     if self.__shield_level == 0:
+    #         return False
+    #
+    #     if self.__rock:
+    #         rock_location = self.get_location()
+    #         self.__rock.set_location(rock_location)
+    #         # print(f"Rover {self.__id} destroyed, hence dropped the rock at location: {rock_location}")
+    #
+    #         mars.set_agent(self.__rock, rock_location)  # Add the rock back to the Mars grid
+    #         self.drop_rock()
+    #
+    #     current_location = self.get_location()
+    #     # print(f"Rover {self.__id} current location before destruction: {current_location}")
+    #
+    #     mars.set_agent(None, current_location)  # Remove the rover from the current location
+    #     self.set_location(None)  # Set the rover's location to None
+    #     self.destroyed = True
+    #     # print(f"Rover {self.__id} has been destroyed and removed from the location.")
+    #     return True
 
     def is_destroyed(self):
         return self.__shield_level == 0

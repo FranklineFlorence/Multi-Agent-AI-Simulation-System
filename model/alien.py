@@ -48,7 +48,7 @@ class Alien(Agent):
 
                     if self.__is_adjacent_to_chasing_rover(mars, chosen_rover):
                         print("~~Alien adjacent")
-                        self.__attack_rover(mars, chosen_rover)
+                        self.__attack_rover(chosen_rover)
                         print("~~Alien attacking")
                         print(f"--------------------------------------------------------------{chosen_rover.get_shield()}")
             else:
@@ -200,11 +200,11 @@ class Alien(Agent):
         #         found_rovers.append(agent)
         # return found_rovers
 
-    def __attack_rover(self, mars: Mars, rover: Rover):
+    def __attack_rover(self, rover: Rover):
         self.__energy -= 20
         # print(f"Alien's current energy level: {self.__energy}")
-        rover.sustain_damage(mars, 25)
-        # print(f"%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%Alien Attacked Rover {rover.get_id()}")
+        rover.sustain_damage(25)
+        print(f"%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%Alien Attacked Rover {rover.get_id()}")
 
     def __restore_energy(self):
         self.__energy = min(self.__energy + 10, 100)
