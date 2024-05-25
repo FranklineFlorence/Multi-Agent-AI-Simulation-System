@@ -31,10 +31,10 @@ class Spacecraft(Agent):
                     rover.get_remembered_rock_locations()
                     rover.recharge(100.0)
                     self.__assign_target_location_to_rover(rover)
-                    print(f"------------------------------------------------"
-                          f"Spacecraft collected a rock from rover {rover.get_id()}. "
-                          f"Total rocks collected: {len(self.__collected_rocks)}"
-                          f"------------------------------------------------")
+                    # print(f"------------------------------------------------"
+                    #       f"Spacecraft collected a rock from rover {rover.get_id()}. "
+                    #       f"Total rocks collected: {len(self.__collected_rocks)}"
+                    #       f"------------------------------------------------")
 
                 # if rover.get_battery_level() == 0:
                 #     self.send_help(rover, mars)
@@ -77,9 +77,9 @@ class Spacecraft(Agent):
         for rover in found_rovers:
             if rover != rover_in_need and rover.get_battery_level() > 50:
                 rover.share_battery(rover_in_need)
-                print(f"Spacecraft coordinated help: {rover} shared battery with {rover_in_need}")
+                # print(f"Spacecraft coordinated help: {rover} shared battery with {rover_in_need}")
                 return
-        print(f"Spacecraft could not find a rover to help {rover_in_need}")
+        # print(f"Spacecraft could not find a rover to help {rover_in_need}")
 
     def get_remembered_rock_locations(self) -> List[Location]:
         return self.__remembered_rock_locations
@@ -96,10 +96,10 @@ class Spacecraft(Agent):
                 self.__assigned_rovers[rover] = location
                 rover.set_target_location(location)
                 self.__remembered_rock_locations.remove(location)
-                print(f"Rover {rover.get_id()} assigned to target location: {location}")
+                # print(f"Rover {rover.get_id()} assigned to target location: {location}")
                 break
-        else:
-            print(f"No available target locations for rover {rover.get_id()}")
+        # else:
+        #     print(f"No available target locations for rover {rover.get_id()}")
     """
     def create_new_rover(self, mars: Mars) -> None:
         if self.__total_rocks_collected >= 100:
