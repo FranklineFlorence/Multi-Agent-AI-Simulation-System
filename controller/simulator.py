@@ -101,6 +101,7 @@ class Simulator:
         # Remove destroyed rovers from the list of agents
         for agent in agents_to_remove:
             self.__agents.remove(agent)
+            self.__mars.set_agent(None, agent.get_location())
 
         for agent in self.__agents:
             agent.act(self.__mars)
