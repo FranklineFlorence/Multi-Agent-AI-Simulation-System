@@ -31,13 +31,12 @@ class Spacecraft(Agent):
                     rover.get_remembered_rock_locations()
                     rover.recharge(100.0)
                     self.__assign_target_location_to_rover(rover)
-                    print(f"------------------------------------------------"
-                          f"Spacecraft collected a rock from rover {rover.get_id()}. "
+                    print(f"Spacecraft collected a rock from rover {rover.get_id()}. "
                           f"Total rocks collected: {len(self.__collected_rocks)}"
                           f"------------------------------------------------")
 
         if len(self.__collected_rocks) >= 100:
-            self.create_new_rover(mars)
+            self.__create_new_rover(mars)
 
     def __scan_for_rovers_in_adjacent_cells(self, mars: Mars) -> List[Rover]:
         adjacent_locations = mars.get_adjacent_locations(self.get_location())
@@ -53,9 +52,9 @@ class Spacecraft(Agent):
         if rock:
             self.__collected_rocks.append(rock)  # Store the rock in the spacecraft
             rover.drop_rock()  # Drop the rock from the rover
-            self.receive_rock_locations(rover.get_remembered_rock_locations())
+            self.__receive_rock_locations(rover.get_remembered_rock_locations())
 
-    def receive_rock_locations(self, rock_locations: List[Location]) -> None:
+    def __receive_rock_locations(self, rock_locations: List[Location]) -> None:
         for location in rock_locations:
             if location not in self.__remembered_rock_locations and location not in self.__assigned_rovers.values():
                 self.__remembered_rock_locations.append(location)
@@ -82,7 +81,7 @@ class Spacecraft(Agent):
                 # print(f"Rover {rover.get_id()} assigned to target location: {location}")
                 break
 
-    def create_new_rover(self, mars: Mars) -> None:
+    def __create_new_rover(self, mars: Mars) -> None:
         free_locations = mars.get_free_adjacent_locations(self.get_location())
         if free_locations:
             new_location = random.choice(free_locations)

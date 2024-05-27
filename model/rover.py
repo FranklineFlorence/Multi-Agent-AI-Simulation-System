@@ -154,21 +154,21 @@ class Rover(Agent):
     def get_remembered_rock_locations(self) -> List[Location]:
         return self.__remembered_rock_locations
 
-    def __select_target_rock(self) -> Optional[Location]:
-        if self.__remembered_rock_locations:
-            return self.__remembered_rock_locations.pop(0)
-        return None
+    # def __select_target_rock(self) -> Optional[Location]:
+    #     if self.__remembered_rock_locations:
+    #         return self.__remembered_rock_locations.pop(0)
+    #     return None
 
     def set_target_location(self, location: Location) -> None:
         self.__target_location = location
 
-    def get_target_location(self) -> Location:
-        return self.__target_location
-
-    def __pass_rock_to_rover(self, other_rover: Rover) -> None:
-        if self.__rock:
-            other_rover.__rock = self.__rock
-            self.__rock = None
+    # def get_target_location(self) -> Location:
+    #     return self.__target_location
+    #
+    # def __pass_rock_to_rover(self, other_rover: Rover) -> None:
+    #     if self.__rock:
+    #         other_rover.__rock = self.__rock
+    #         self.__rock = None
 
     """
     ===== Functions for Scanning =====
@@ -217,13 +217,13 @@ class Rover(Agent):
                 found_rovers.append(agent)
         return found_rovers
 
-    def __is_adjacent_to_other_rover(self, mars: Mars) -> bool:
-        adjacent_locations = mars.get_adjacent_locations(self.get_location())
-        for adjacent_location in adjacent_locations:
-            agent = mars.get_agent(adjacent_location)
-            if isinstance(agent, Rover):
-                return True
-        return False
+    # def __is_adjacent_to_other_rover(self, mars: Mars) -> bool:
+    #     adjacent_locations = mars.get_adjacent_locations(self.get_location())
+    #     for adjacent_location in adjacent_locations:
+    #         agent = mars.get_agent(adjacent_location)
+    #         if isinstance(agent, Rover):
+    #             return True
+    #     return False
 
     def __is_adjacent_to(self, mars: Mars, location: Location) -> bool:
         adjacent_locations = mars.get_adjacent_locations(self.get_location())
@@ -241,13 +241,14 @@ class Rover(Agent):
 
     def recharge(self, amount: float):
         self.__battery_level = min(self.__battery_level + amount, 100.0)
+        # print(f"Rover {self.__id} fully charged!")
 
     def share_battery(self, other_rover: Rover):
         if self.__battery_level > 50:
             share_amount = self.__battery_level - 50
             self.__battery_level -= share_amount
             other_rover.recharge(share_amount)
-            # print(f"Rover {self.__id} shared {share_amount} battery with Rover {other_rover.get_id()}")
+            print(f"Rover {self.__id} shared {share_amount} battery with Rover {other_rover.get_id()}")
         # else:
             # print(f"Rover {self.__id} has insufficient battery (Battery level: {self.__battery_level}) "
             #       f"to share with Rover {other_rover.get_id()} ")
@@ -309,19 +310,19 @@ class Rover(Agent):
             other_rover (Rover): The other rover from which to pick up the rock.
         """
         print(f"Attempting to pick rock from Rover {other_rover.get_id()} by ##Rover {self.get_id()}")
-
         rock = other_rover.get_rock()
         if rock and not self.get_rock():
             # Transfer the rock from the other rover to this rover
             self.set_rock(rock)
             other_rover.drop_rock()
+            print(f"Rover {self.__id} picked rock from Rover {other_rover.__id}")
 
     """
     ===== ACT METHOD =====
     """
 
     def act(self, mars: Mars):
-        # print(f"Rover {self.__id}- Battery level: {self.__battery_level}, Current location: {self.get_location()}")
+        print(f"Rover {self.__id}- Battery level: {self.__battery_level}, Current location: {self.get_location()}")
         if self.__shield_level == 0:
             # print("is destroyed")
             return
@@ -329,7 +330,7 @@ class Rover(Agent):
             if self.__rock:
                 # print(f"=============| Rover {self.__id} has rock |===================")
                 if self.__scan_for_spacecraft_in_adjacent_cells(mars):
-                    # print(f"Rover {self.__id} waiting to drop rock")
+                    # print(f"Rover {self.__id} adjacent to spacecraft drop rock")
                     return
                 else:
                     # print(f"Rover {self.__id} moving towards spacecraft.")
@@ -350,14 +351,14 @@ class Rover(Agent):
             else:
                 adjacent_rocks = self.__scan_for_rocks(mars)
                 if len(adjacent_rocks) > 0:
-                    # print(f"Rover {self.__id} picking up adjacent rock.")
+                    print(f"Rover {self.__id} picking up adjacent rock.")
                     self.__pick_up_rock(mars, adjacent_rocks[0])
                     if len(adjacent_rocks) > 1:
                         remaining_rocks = adjacent_rocks[1:]
                         for rock in remaining_rocks:
                             self.__remember_rock_location(rock.get_location())
                             # print(f"-----------------------------------------------------")
-                            # print(f"|Rover {self.__id} remembering rock location =>{rock.get_location()}|")
+                            print(f"|Rover {self.__id} remembering rock location =>{rock.get_location()}|")
                 else:
                     # print(f"Rover {self.__id} moving to random location.")
                     self.__move_to_random_location(mars)
@@ -370,7 +371,7 @@ class Rover(Agent):
                 nearby_rovers = self.__scan_for_rovers(mars)
                 for nearby_rover in nearby_rovers:
                     if nearby_rover.get_battery_level() > 50:
-                        # print(f"Rover {self.__id} requesting battery from nearby rover {nearby_rover.get_id()}")
+                        print(f"Rover {self.__id} requesting battery from nearby rover {nearby_rover.get_id()}")
                         nearby_rover.share_battery(self)
                         if self.__rock is None:
                             self.pick_rock_from_rover(nearby_rover)

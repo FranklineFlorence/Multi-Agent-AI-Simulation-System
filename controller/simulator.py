@@ -87,7 +87,6 @@ class Simulator:
 
     def __update(self) -> None:
         """Update the simulation state."""
-        #
 
         # Create a list to store agents that need to be removed
         agents_to_remove = []
