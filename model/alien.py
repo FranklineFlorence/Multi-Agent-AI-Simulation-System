@@ -260,4 +260,3 @@ class Alien(Agent):
         self.__energy = min(self.__energy + 10, 100)
         if self.__energy == 100:
             self.__hibernating = False
-
