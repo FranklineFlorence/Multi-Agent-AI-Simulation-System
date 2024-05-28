@@ -81,6 +81,24 @@ class Simulator:
             if self.__gui.is_closed():
                 self.__is_running = False
 
+            # Check if all rovers are destroyed or no rocks remaining
+            if self.__all_rovers_destroyed() or self.__no_rocks_remaining():
+                self.__is_running = False
+
+    def __all_rovers_destroyed(self) -> bool:
+        """Check if all rovers are destroyed."""
+        for agent in self.__agents:
+            if isinstance(agent, Rover) and not agent.is_destroyed():
+                return False
+        return True
+
+    def __no_rocks_remaining(self) -> bool:
+        """Check if no rocks remaining."""
+        for agent in self.__agents:
+            if isinstance(agent, Rock):
+                return False
+        return True
+
     def __render(self) -> None:
         """Render the current state of the simulation."""
         self.__gui.render()

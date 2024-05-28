@@ -93,9 +93,6 @@ class Mars(Environment):
             wrapped_y = location.get_y() % Config.world_size
             self.__grid[wrapped_y][wrapped_x] = agent
 
-    def is_within_bounds(self, location: Location) -> bool:
-        return 0 <= location.get_x() < self.get_width() and 0 <= location.get_y() < self.get_height()
-
     def get_width(self) -> int:
         """Returns the width of the Mars grid."""
         return Config.world_size
