@@ -8,7 +8,7 @@ from model.location import Location
 
 if TYPE_CHECKING:
     from model.agent import Agent
-    from model.spacecraft import Spacecraft
+    from model.rover import Rover
 
 
 class Mars(Environment):
@@ -24,6 +24,7 @@ class Mars(Environment):
         self.__grid: List[List[Optional[Agent, None]]] = [
             [None for _ in range(self.get_width())] for _ in range(self.get_height())
         ]
+        self.rovers: List[Rover] = []  # Initialize the list to store all rovers
 
     def clear(self) -> None:
         """Clears all agents from the grid."""
@@ -109,3 +110,12 @@ class Mars(Environment):
                 if self.get_agent(location) is None:
                     free_locations.append(location)
         return free_locations
+
+    def get_all_rovers(self) -> List[Rover]:
+        """
+        Get all rovers present on Mars.
+
+        Returns:
+            List[Rover]: A list of all rovers.
+        """
+        return self.rovers

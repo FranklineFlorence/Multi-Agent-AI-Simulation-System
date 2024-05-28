@@ -1,6 +1,7 @@
 from __future__ import annotations
 import random
 from typing import List, TYPE_CHECKING
+from itertools import combinations
 from model.agent import Agent
 from model.rover import Rover
 from model.rock import Rock
@@ -59,6 +60,13 @@ class Spacecraft(Agent):
                     self.__assign_target_location_to_rover(rover)
                     print(f"Spacecraft collected a rock from rover {rover.get_id()}. "
                           f"Total rocks collected: {len(self.__collected_rocks)}")
+        # if len(self.__collected_rocks) >= 30:
+        #     # Reason to have thirty is because it already means it has collected rocks in the surroundings
+        #     print(f"SpaceCraft at {self.get_location()} has collected 30 or more rocks. Initiating collaboration.")
+        #     # Identify rovers available for collaboration
+        #     available_rovers = self.get_available_rovers(mars)
+        #     # Group rovers to retrieve distant rocks
+        #     self.group_rovers_to_retrieve_distant_rock(available_rovers, mars)
 
         if len(self.__collected_rocks) >= 100:
             self.__create_new_rover(mars)
@@ -147,3 +155,76 @@ class Spacecraft(Agent):
             mars.set_agent(new_rover, new_location)
             self.__collected_rocks = self.__collected_rocks[100:]  # Remove the first 100 collected rocks
             print(f"New rover created at location {new_location}")
+
+    @staticmethod
+    def find_common_adjacent_rock_locations(rovers: List[Rover], mars: Mars) -> List[Location]:
+        """
+        Find common adjacent rock locations for a group of rovers.
+
+        Args:
+            rovers (List[Rover]): The list of rovers in the group.
+            mars (Mars): The Mars environment.
+
+        Returns:
+            List[Location]: A list of common adjacent rock locations for the group of rovers.
+        """
+        common_adjacent_rock_locations = []
+        # Get adjacent locations for the first rover in the group
+        first_rover = rovers[0]
+        first_rover_adjacent_locations = mars.get_adjacent_locations(first_rover.get_location())
+        # Check if each adjacent location has a rock adjacent to all rovers in the group
+        for location in first_rover_adjacent_locations:
+            if all(mars.get_agent(location) == rover.get_rock() for rover in rovers[1:]):
+                common_adjacent_rock_locations.append(location)
+        return common_adjacent_rock_locations
+
+    def group_rovers_to_retrieve_distant_rock(self, rovers: List[Rover], mars: Mars) -> None:
+        """
+        Group rovers together to retrieve a distant rock.
+
+        This method identifies pairs of rovers that can work together to retrieve a distant rock.
+        It then instructs these pairs of rovers to collaborate and retrieve the rock.
+
+        Args:
+            rovers (List[Rover]): The list of rovers available for collaboration.
+            mars (Mars): The Mars environment.
+        """
+        # Create a list to store the pairs of rovers
+        rover_pairs = []
+        print("Grouping rovers for collaboration...")
+
+        # Find all possible pairs of rovers
+        for rover_pair in combinations(rovers, 2):
+            rover_pairs.append(rover_pair)
+
+        # Iterate over the pairs of rovers and instruct them to retrieve a distant rock
+        for rover_pair in rover_pairs:
+            # Find common adjacent rock locations for the rover pair
+            common_adjacent_rock_locations = self.find_common_adjacent_rock_locations(list(rover_pair), mars)
+            if common_adjacent_rock_locations:
+                print(f"Collaboration initiated between rovers: {[rover.get_id() for rover in rover_pair]}")
+                # Instruct the rovers to move towards the common adjacent rock location and pick it up
+                for location in common_adjacent_rock_locations:
+                    # Set target location for all rovers in the pair
+                    for rover in rover_pair:
+                        rover.set_target_location(location)
+                    # Move all rovers in the pair towards the rock location
+                    for rover in rover_pair:
+                        rover.act(mars)
+                    # Check if the rock is picked up by any rover in the pair
+                    if all(location == rover.get_location() for rover in rover_pair):
+                        print("Rock picked up by collaborating rovers.")
+                        break  # If the rock is picked up by both rovers, break out of the loop
+
+    @staticmethod
+    def get_available_rovers(mars: Mars) -> List[Rover]:
+        """
+        Get a list of available rovers associated with this spacecraft.
+
+        Args:
+            mars (Mars): The Mars environment.
+
+        Returns:
+            List[Rover]: A list of available rovers.
+        """
+        return mars.get_all_rovers()
