@@ -125,12 +125,6 @@ class TestRover(unittest.TestCase):
         self.assertTrue(self.rover.has_rock())
         self.assertEqual(self.rover.get_rock(), rock)
 
-    def test_drop_rock(self):
-        rock = Rock(self.rover_location)
-        self.rover.set_rock(rock)
-        self.rover.drop_rock()
-        self.assertFalse(self.rover.has_rock())
-
     def test_remember_rock_location(self):
         self.rover._Rover__remember_rock_location(Location(1, 1))
         self.assertIn(Location(1, 1), self.rover.get_remembered_rock_locations())
@@ -143,6 +137,58 @@ class TestRover(unittest.TestCase):
         self.rover.pick_rock_from_rover(other_rover)
         self.assertEqual(self.rover.get_rock(), rock)
         self.assertIsNone(other_rover.get_rock())
+
+    def test_has_rock(self):
+        rover = Rover(Location(0, 0), Location(0, 0))
+        self.assertFalse(rover.has_rock())
+        rock = Rock(Location(0, 0))
+        rover.set_rock(rock)
+        self.assertTrue(rover.has_rock())
+
+    def test_drop_rock(self):
+        rover = Rover(Location(0, 0), Location(0, 0))
+        rock = Rock(Location(0, 0))
+        rover.set_rock(rock)
+        rover.drop_rock()
+        self.assertIsNone(rover.get_rock())
+
+    def test_get_remembered_rock_locations(self):
+        rover = Rover(Location(0, 0), Location(0, 0))
+        rock_location = Location(1, 1)
+        rover._Rover__remembered_rock_locations.append(rock_location)
+        remembered_locations = rover.get_remembered_rock_locations()
+        self.assertEqual(len(remembered_locations), 1)
+        self.assertEqual(remembered_locations[0], rock_location)
+
+    def test_set_target_location(self):
+        rover = Rover(Location(0, 0), Location(0, 0))
+        target_location = Location(1, 1)
+        rover.set_target_location(target_location)
+        self.assertEqual(rover._Rover__target_location, target_location)
+
+    def test_get_battery_level(self):
+        rover = Rover(Location(0, 0), Location(0, 0))
+        self.assertEqual(rover.get_battery_level(), 100.0)
+
+    def test_get_shield(self):
+        rover = Rover(Location(0, 0), Location(0, 0))
+        self.assertEqual(rover.get_shield(), 100)
+
+    def test_recharge(self):
+        rover = Rover(Location(0, 0), Location(0, 0))
+        rover.recharge(50)
+        self.assertEqual(rover.get_battery_level(), 100.0)
+
+    def test_sustain_damage(self):
+        rover = Rover(Location(0, 0), Location(0, 0))
+        rover.sustain_damage(50)
+        self.assertEqual(rover.get_shield(), 50)
+
+    def test_is_destroyed(self):
+        rover = Rover(Location(0, 0), Location(0, 0))
+        self.assertFalse(rover.is_destroyed())
+        rover.sustain_damage(100)
+        self.assertTrue(rover.is_destroyed())
 
 
 if __name__ == '__main__':
