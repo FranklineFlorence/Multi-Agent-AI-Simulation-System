@@ -81,6 +81,6 @@ For issues, feature requests, or feedback, reach out via GitHub Issues or email 
 
 🌟 If you like this project, don't forget to star ⭐ the repository!
 
-Join us in exploring the possibilities of AI-driven space exploration! 🚀
+Join me in exploring the possibilities of AI-driven space exploration! 🚀
 
 Happy coding! 🚀
